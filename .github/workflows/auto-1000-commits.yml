@@ -1,1 +1,37 @@
+name: Auto 1000 Commits
 
+on:
+  schedule:
+    # Runs at 00:00 UTC every 4 days (~96 hours)
+    - cron: '*/30 * * * *'   
+  workflow_dispatch: # Allows you to manually trigger it from the Actions tab
+
+jobs:
+  make-commits:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "image-warehouse"
+          git config --global user.email "rutaabali3+drive@gmail.com"
+
+      - name: Create 1000 commits
+        run: |
+          for i in {1..1000}
+          do
+            echo "Update $(date +'%Y-%m-%d %H:%M:%S.%N') - commit $i" >> activity_log.txt
+            git add activity_log.txt
+            git commit -m "Auto commit $i [skip ci]"
+          done
+
+      - name: Push commits
+        run: |
+          git push origin main
